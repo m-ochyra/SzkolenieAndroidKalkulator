@@ -2,6 +2,7 @@ package com.example.myapplication;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -37,6 +38,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         bSub.setOnClickListener(this);
         bMultiply.setOnClickListener(this);
         bDivide.setOnClickListener(this);
+
+        SharedPreferences preferences = getPreferences(MODE_PRIVATE);
+        String results = preferences.getString("results", "");
+
+        tvResult.setText(results);
     }
 
     @Override
@@ -45,7 +51,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         String value2 = etNumberTwo.getText().toString();
 
         if(value1.isEmpty() || value2.isEmpty()) {
-            Toast.makeText(this, "Nie podano wartości", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, getString(R.string.no_value), Toast.LENGTH_SHORT).show();
         } else {
             int number1 = Integer.valueOf(value1);
             int number2 = Integer.valueOf(value2);
@@ -70,16 +76,22 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private void add(int number1, int number2) {
         int result = number1 + number2;
         tvResult.setText(String.valueOf(result));
+
+        save(number1, number2, result, getString(R.string.plus));
     }
 
     private void subs(int number1, int number2) {
         int result = number1 - number2;
         tvResult.setText(String.valueOf(result));
+
+        save(number1, number2, result, "-");
     }
 
     private void multiply(int number1, int number2) {
         int result = number1 * number2;
         tvResult.setText(String.valueOf(result));
+
+        save(number1, number2, result, "*");
     }
 
     private void divide(int number1, int number2) {
@@ -88,6 +100,18 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         } else {
             int result = number1 / number2;
             tvResult.setText(String.valueOf(result));
+
+            save(number1, number2, result, "/");
         }
+    }
+
+    private void save(int number1, int number2, int result, String sign) {
+        String saved = number1 + sign + number2 + " = " + result;
+
+        SharedPreferences preferences = getPreferences(MODE_PRIVATE);
+        SharedPreferences.Editor editor = preferences.edit();
+
+        editor.putString("results", saved);
+        editor.apply();
     }
 }
